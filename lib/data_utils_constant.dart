@@ -7,7 +7,12 @@ import 'package:xh_dio_utils/base_info.dart';
 
 import 'toast_util.dart';
 
-class DataUtilsBasic {
+abstract class BasicAction{
+  void tokenExpired();
+}
+
+
+class DataUtilsBasic extends BasicAction{
   static const String SERVER_ERROR = '服务器异常';
   static const String SERVER_TIMEOUT_ERROR = '请求超时';
   static const String SEND_TIMEOUT_ERROR = '发送请求超时';
@@ -23,10 +28,14 @@ class DataUtilsBasic {
   static const int HTTP_NEED_RESET_PWD = 30001;
 
 
-  ///token dept身份验证过期处理
+
+  @override
+  void tokenExpired() {}
+
+  ///token 身份验证过期处理
   void failAction(String tag,BaseInfo baseInfo,{isShowToast = true}) {
     if (baseInfo.code == HTTP_NEED_LOGIN_AGAIN) {
-      //todo Global.clearAllInfo();
+      tokenExpired();
     }
     
     if (isShowToast && baseInfo.msg != null) {
