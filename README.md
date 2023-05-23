@@ -1,14 +1,5 @@
 
 A Dio Utils
-
-## Features
-
-
-
-## Getting started
-
-
-
 ## Usage
 
 
@@ -29,5 +20,4 @@ A Dio Utils
 
 ```
 
-## Additional information
 
