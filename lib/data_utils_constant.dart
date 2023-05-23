@@ -1,18 +1,15 @@
 // ignore_for_file: constant_identifier_names
 
-
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:xh_dio_utils/base_info.dart';
+import 'package:xh_dio_utils/abstract_base_info.dart';
+import 'package:toast_utils/toast_utils.dart';
 
-import 'toast_util.dart';
-
-abstract class BasicAction{
+abstract class BasicAction {
   void tokenExpired();
 }
 
-
-class DataUtilsBasic extends BasicAction{
+class DataUtilsBasic<T extends AbstractBaseInfo> extends BasicAction {
   static const String SERVER_ERROR = '服务器异常';
   static const String SERVER_TIMEOUT_ERROR = '请求超时';
   static const String SEND_TIMEOUT_ERROR = '发送请求超时';
@@ -22,26 +19,26 @@ class DataUtilsBasic extends BasicAction{
   static const String connectionError = '连接出错';
   static const String X_TOKEN = 'X-Token';
 
-  static const int HTTP_SUCCESS_CODE = 20000;
-  // static const int HTTP_NEED_LOGIN_AGAIN = 40005;
-  static const int HTTP_NEED_LOGIN_AGAIN = 40004;
-  static const int HTTP_NEED_RESET_PWD = 30001;
+  static int HTTP_SUCCESS_CODE = 20000;
 
+  // static const int HTTP_NEED_LOGIN_AGAIN = 40005;
+  static int HTTP_NEED_LOGIN_AGAIN = 40004;
+  static int HTTP_NEED_RESET_PWD = 30001;
 
 
   @override
   void tokenExpired() {}
 
   ///token 身份验证过期处理
-  void failAction(String tag,BaseInfo baseInfo,{isShowToast = true}) {
-    if (baseInfo.code == HTTP_NEED_LOGIN_AGAIN) {
+  void failAction(String tag, T abstractBaseInfo, {isShowToast = true}) {
+    if (abstractBaseInfo.code == HTTP_NEED_LOGIN_AGAIN) {
       tokenExpired();
     }
-    
-    if (isShowToast && baseInfo.msg != null) {
-      ToastUtil.show(baseInfo.msg!);
+
+    if (isShowToast && abstractBaseInfo.msg != null) {
+      ToastUtil.show(abstractBaseInfo.msg!);
     }
-    debugPrint('$tag api接口请求失败 ${baseInfo.toJson()}');
+    debugPrint('$tag api接口请求失败 ${abstractBaseInfo.toJson()}');
   }
 
   ///网络异常处理

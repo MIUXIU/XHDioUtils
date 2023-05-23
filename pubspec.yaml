@@ -1,6 +1,6 @@
 name: xh_dio_utils
 description: A Dio Utils.
-version: 1.0.1
+version: 1.1.0
 homepage: https://github.com/MIUXIU/XHDioUtils
 
 environment:
@@ -8,15 +8,19 @@ environment:
   flutter: ">=1.17.0"
 
 dependencies:
-  dio: ^5.1.2
   flutter:
     sdk: flutter
-  fluttertoast: ^8.2.1
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^2.0.0
+  fluttertoast: ^8.2.1
+  dio: ^5.1.2
+  toast_utils:
+    git:
+      url: https://github.com/MIUXIU/ToastUtils
+      ref: v1.1.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

@@ -1,4 +1,6 @@
-class BaseInfo {
+import 'package:xh_dio_utils/abstract_base_info.dart';
+
+class BaseInfo extends AbstractBaseInfo{
   int? code;
   String? msg;
 
