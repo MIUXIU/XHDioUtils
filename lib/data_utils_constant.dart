@@ -18,6 +18,7 @@ class DataUtilsBasic<T extends AbstractBaseInfo> extends BasicAction {
   static const String badCertificate = '证书错误';
   static const String connectionError = '连接出错';
   static const String X_TOKEN = 'X-Token';
+  static const String X_SIGNATURE = 'X-Signature';
 
   static int HTTP_SUCCESS_CODE = 20000;
 

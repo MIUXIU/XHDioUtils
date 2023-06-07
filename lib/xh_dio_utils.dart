@@ -3,6 +3,7 @@ import 'package:dio/dio.dart';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:xh_dio_utils/data_utils_constant.dart';
 
 
 /// 请求方法
@@ -24,8 +25,18 @@ const _methodValues = {
   DioMethod.head: 'head'
 };
 
+///解密方法函数
+typedef DecryptFunction =String Function({required String data,required String key});
+///加密方法函数
+typedef EncryptFunction =Object Function({required Object data,required String key});
+
+///生成Key的方法
+typedef GenerateKeyFunction = Map<String, String> Function();
+
 class XHDioUtil {
   static const String _tag = 'DioUtil';
+  ///Key:aesKey  ，baseKey: X_Signature
+  static const String key = "key1", baseKey = "key2";
   static final LogInterceptor logInterceptor =  LogInterceptor(responseHeader: true, responseBody: true,requestBody: true);
 
   static final Map _dioMap = <String, XHDioUtil>{};
@@ -37,6 +48,10 @@ class XHDioUtil {
   static Duration _receiveTimeout = const Duration(seconds: 30);
 
   final Map<String, Object> _commonHeaders = {};
+
+  DecryptFunction? decryptFunction;
+  EncryptFunction? encryptFunction;
+  GenerateKeyFunction? generateKeyFunction;
 
   var isOpenLog = false;
 
@@ -133,11 +148,6 @@ class XHDioUtil {
           _printLog('onResponse');
           return handler.next(response);
         },
-        // onError: (e, handler) {
-        //   // 如果你想完成请求并返回一些自定义数据，你可以使用 `handler.resolve(response)`。
-        //   _printLog('onError');
-        //   return handler.next(e);
-        // },
       ),
     );
 
@@ -173,13 +183,47 @@ class XHDioUtil {
         data,
         CancelToken? cancelToken,
         Options? options,
+        bool useDecrypt = false,
+        bool useEncrypt = false,
+        bool useSignature = false,
         ProgressCallback? onSendProgress,
         ProgressCallback? onReceiveProgress,
         Function? beanFromJson}) async {
     if (_dio == null) {
       _printLog('DioUtil must build first');
     }
-    options ??= Options(method: _methodValues[method]);
+    options ??= Options();
+    options.headers ??= <String, dynamic>{};
+
+    String? key;
+    String? baseKey;
+    if(useSignature) {
+      Map<String, String> mapKey = generateKeyFunction?.call()??{};
+      key = mapKey[XHDioUtil.key];
+      baseKey = mapKey[XHDioUtil.baseKey];
+      options.headers?[DataUtilsBasic.X_SIGNATURE] = baseKey;
+
+      ///需要加密
+      if(useEncrypt && key != null){
+        if(data != null) {
+          try {
+            data = encryptFunction?.call(data:data,key:key);
+          } catch (e) {
+            _printLog('encryptFunction data Error: $e');
+          }
+        }
+
+        if(params != null){
+          try {
+            params = encryptFunction?.call(data:params,key:key) as Map<String, dynamic>?;
+          } catch (e) {
+            _printLog('encryptFunction params Error: $e');
+          }
+        }
+      }
+    }
+
+    options.method = _methodValues[method];
     try {
       Response response;
       response = await _dio!.request(path,
@@ -189,8 +233,14 @@ class XHDioUtil {
           options: options,
           onSendProgress: onSendProgress,
           onReceiveProgress: onReceiveProgress);
+
+      String responseData = response.data.toString();
+      DecryptFunction? decrypt = decryptFunction;
+      if(useDecrypt && decrypt != null && key != null){
+        responseData = decrypt(data:responseData,key: key);
+      }
       if (beanFromJson != null) {
-        Map dataMap = json.decode(response.data.toString());
+        Map dataMap = json.decode(responseData);
         dynamic resultBean = beanFromJson(dataMap);
         return resultBean;
       }
