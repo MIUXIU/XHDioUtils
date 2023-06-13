@@ -177,7 +177,7 @@ class XHDioUtil {
   }
 
   /// 请求类
-  Future<T> request<T>(String path,
+  Future request<T>(String path,
       {DioMethod method = DioMethod.get,
         Map<String, dynamic>? params,
         data,
@@ -186,6 +186,7 @@ class XHDioUtil {
         bool useDecrypt = false,
         bool useEncrypt = false,
         bool useSignature = false,
+        bool useRaw = false,
         ProgressCallback? onSendProgress,
         ProgressCallback? onReceiveProgress,
         Function? beanFromJson}) async {
@@ -233,6 +234,10 @@ class XHDioUtil {
           options: options,
           onSendProgress: onSendProgress,
           onReceiveProgress: onReceiveProgress);
+
+      if(useRaw){
+        return response;
+      }
 
       String responseData = response.data.toString();
       DecryptFunction? decrypt = decryptFunction;
