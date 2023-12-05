@@ -28,7 +28,7 @@ const _methodValues = {
 ///解密方法函数
 typedef DecryptFunction =String Function({required String data,required String key});
 ///加密方法函数
-typedef EncryptFunction =Object Function({required Object data,required String key});
+typedef EncryptFunction =Object Function({required Object data,required String key,String? baseKey});
 
 ///生成Key的方法
 typedef GenerateKeyFunction = Map<String, String> Function();
@@ -208,7 +208,7 @@ class XHDioUtil {
       if(useEncrypt && key != null){
         if(data != null) {
           try {
-            data = encryptFunction?.call(data:data,key:key);
+            data = encryptFunction?.call(data:data,key:key,baseKey:baseKey);
           } catch (e) {
             _printLog('encryptFunction data Error: $e');
           }
@@ -216,7 +216,7 @@ class XHDioUtil {
 
         if(params != null){
           try {
-            params = encryptFunction?.call(data:params,key:key) as Map<String, dynamic>?;
+            params = encryptFunction?.call(data:params,key:key,baseKey:baseKey) as Map<String, dynamic>?;
           } catch (e) {
             _printLog('encryptFunction params Error: $e');
           }
